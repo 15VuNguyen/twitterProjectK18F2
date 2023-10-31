@@ -1,16 +1,21 @@
 import { Router } from 'express'
 import {
   emailVerifyTokenController,
+  forgotPasswordController,
   loginController,
   logoutController,
-  registerController
+  registerController,
+  resendEmailVerifyController,
+  verifyForgotPasswordTokenController
 } from '~/controllers/users.controllers'
 import {
   accessTokenValidator,
   emailVerifyTokenValidator,
+  forgotPasswordValidator,
   loginValidator,
   refreshTokenValidator,
-  registerValidator
+  registerValidator,
+  verifyForgotPasswordTokenValidator
 } from '~/middlewares/users.middlewares'
 import { wrapAsync } from '~/utils/handlers'
 
@@ -61,5 +66,39 @@ usersRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapAsy
  * body: {email_verify_token: string}
  */
 usersRouter.post('/verify-email', emailVerifyTokenValidator, wrapAsync(emailVerifyTokenController))
+
+/**
+ * des: resend email verify email token
+ * khi mail thất lạc, hoặc email_verify_token hết hạn,
+ * thì người dùng có nhu cầu resend email_verify_token
+ * method: post
+ * path: /users/resend-verify-email
+ * headers: {Authorization: "Bearer <access_token>"} //đăng nhập mới đc resend
+ * body: {}
+ */
+usersRouter.post('/resend-verify-email', accessTokenValidator, wrapAsync(resendEmailVerifyController))
+
+/**
+ * des: khi người dùng quên mật khẩu, họ gửi email để xin mình tạo cho họ forgot_password_token
+ * path: /users/forgot-password
+ * method: POST
+ * body: {email: string}
+ */
+usersRouter.post('/forgot-passwrod', forgotPasswordValidator, wrapAsync(forgotPasswordController))
+
+/**
+ * des: khi người dùng nhấp vào link trong email để reset password
+ * họ sẽ gửi 1 req kèm theo forgot_password_token lên server
+ * server sẽ kiểm tra forgot_password_token có hợp lệ hay không ?
+ * sau đó chuyển hướng người dùng đến trang reset password
+ * path: /users/verify-forgot-password
+ * method: POST
+ * body: {forgot_password_token: string}
+ */
+usersRouter.post(
+  '/verify-forgot-password',
+  verifyForgotPasswordTokenValidator,
+  wrapAsync(verifyForgotPasswordTokenController)
+)
 
 export default usersRouter
