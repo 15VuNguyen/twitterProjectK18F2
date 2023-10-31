@@ -1,4 +1,4 @@
-// file này dùng để dịnh nghĩa lại Req truyền lên từ client
+// file này dùng để dịnh nghĩa lại (module) Req truyền lên từ client
 import { Request } from 'express'
 import { TokenPayload } from './models/requests/User.reqests'
 
