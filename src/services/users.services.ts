@@ -132,7 +132,7 @@ class UsersService {
     //tạo ra email_verify_token
     const email_verify_token = await this.signEmailVerifyToken(user_id)
     //update lại user
-    await databaseService.users.updateOne({ id: new ObjectId(user_id) }, [
+    await databaseService.users.updateOne({ _id: new ObjectId(user_id) }, [
       {
         $set: {
           email_verify_token,

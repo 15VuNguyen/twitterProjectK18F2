@@ -62,6 +62,7 @@ export const emailVerifyTokenController = async (
     })
   }
   //chưa check trường hợp user.verify bị band (user.verify !== UserVerifyStatus.unVerified)
+  //nếu đã verify rồi thì kh cần verify nữa
   if (user.verify === UserVerifyStatus.Verified && user.email_verify_token === '') {
     return res.json({
       message: USERS_MESSAGES.EMAIL_ALREADY_VERIFIED_BEFORE
