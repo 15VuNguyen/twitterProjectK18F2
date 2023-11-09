@@ -1,6 +1,8 @@
 import { Router } from 'express'
 import {
+  changePasswordController,
   emailVerifyTokenController,
+  followController,
   forgotPasswordController,
   getMeController,
   getProfileController,
@@ -9,18 +11,22 @@ import {
   registerController,
   resendEmailVerifyController,
   resetPasswordController,
+  unfollowController,
   updateMeController,
   verifyForgotPasswordTokenController
 } from '~/controllers/users.controllers'
 import { filterMiddleware } from '~/middlewares/common.middlewares'
 import {
   accessTokenValidator,
+  changePasswordValidator,
   emailVerifyTokenValidator,
+  followValidator,
   forgotPasswordValidator,
   loginValidator,
   refreshTokenValidator,
   registerValidator,
   resetPasswordValidator,
+  unfollowValidator,
   updateMeValidator,
   verifiedUserValidator,
   verifyForgotPasswordTokenValidator
@@ -37,7 +43,7 @@ path: /users/login
 method: POST
 body: {email, password}
 */
-usersRouter.get('/login', loginValidator, wrapAsync(loginController))
+usersRouter.post('/login', loginValidator, wrapAsync(loginController))
 
 /**
  * Description: Register new user
@@ -161,5 +167,54 @@ usersRouter.patch(
  */
 usersRouter.get('/:username', wrapAsync(getProfileController))
 //chưa có controller getProfileController, nên bây giờ ta làm
+
+/*
+des: Follow someone
+path: '/follow'
+method: post
+headers: {Authorization: Bearer <access_token>}
+body: {followed_user_id: string}
+*/
+usersRouter.post('/follow', accessTokenValidator, verifiedUserValidator, followValidator, wrapAsync(followController))
+//accessTokenValidator dùng dể kiểm tra xem ngta có đăng nhập hay chưa, và có đc user_id của người dùng từ req.decoded_authorization
+//verifiedUserValidator dùng để kiễm tra xem ngta đã verify email hay chưa, rồi thì mới cho follow người khác
+//trong req.body có followed_user_id  là mã của người mà ngta muốn follow
+//followValidator: kiểm tra followed_user_id truyền lên có đúng định dạng objectId hay không
+//  account đó có tồn tại hay không
+//followController: tiến hành thao tác tạo document vào collection followers
+/*
+user 50 654d1871832bfe3381763dba
+user 54 654d18fd37b1c7c2936bcf75
+*/
+
+/**
+ * des: Unfollow someone
+ * path: '/unfollow/:user_id'
+ * method: delete
+ * headers: {Authorization: Bearer <access_token>}
+ */
+usersRouter.delete(
+  '/unfollow/:user_id',
+  accessTokenValidator,
+  verifiedUserValidator,
+  unfollowValidator,
+  wrapAsync(unfollowController)
+)
+
+/**
+ * des: change password
+ * path: '/change-password'
+ * method: put
+ * headers: {Authorization: Bearer <access_token>}
+ * Body: {old_password: string, new_password: string, confirm_new_password: string}
+ */
+usersRouter.put(
+  '/change-password',
+  accessTokenValidator,
+  verifiedUserValidator,
+  changePasswordValidator,
+  wrapAsync(changePasswordController)
+)
+//changePasswordValidator kiểm tra các giá trị truyền lên trên body cớ valid k ?
 
 export default usersRouter
