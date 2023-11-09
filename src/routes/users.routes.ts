@@ -8,6 +8,7 @@ import {
   getProfileController,
   loginController,
   logoutController,
+  refreshTokenController,
   registerController,
   resendEmailVerifyController,
   resetPasswordController,
@@ -216,5 +217,15 @@ usersRouter.put(
   wrapAsync(changePasswordController)
 )
 //changePasswordValidator kiểm tra các giá trị truyền lên trên body cớ valid k ?
+
+/**
+ * des: refreshtoken
+ * path: '/refresh-token'
+ * method: POST
+ * Body: {refresh_token: string}
+ */
+usersRouter.post('/refresh-token', refreshTokenValidator, wrapAsync(refreshTokenController))
+//khỏi kiểm tra accesstoken, tại nó hết hạn rồi mà
+//refreshController chưa làm
 
 export default usersRouter
